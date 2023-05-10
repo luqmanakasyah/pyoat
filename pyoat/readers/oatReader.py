@@ -1,9 +1,9 @@
-#-----
+# -----
 # Description   : Data reader
 # Date          : February 2021
 # Author        : Berkan Lafci
 # E-mail        : lafciberkan@gmail.com
-#-----
+# -----
 
 # import Python libraries
 import os
@@ -12,8 +12,10 @@ import time
 import logging
 import numpy as np
 import scipy.io as sio
+from utils import averageSignals
 
-class oaReader():
+
+class oaReader:
     """
     Optoacoustic data reader
 
@@ -24,36 +26,40 @@ class oaReader():
 
     :return:            oaReader object
     """
-    
+
     # initialize the class
-    def __init__(self, folderPath=None, scanName=None, averaging=False, averagingAxis=2):
+    def __init__(
+        self, folderPath=None, scanName=None, averaging=False, averagingAxis=2
+    ):
         logging.info('  Class       "oaReader"          : %s', __name__)
-        
-        self._folderPath    = folderPath
-        self._scanName      = scanName
-        self._averaging     = averaging
+
+        self._folderPath = folderPath
+        self._scanName = scanName
+        self._averaging = averaging
         self._averagingAxis = averagingAxis
- 
+
         # print info about process
-        print('***** reading data *****')
-        startTime        = time.time()
-            
-        if self.folderPath==None or scanName==None:
-            print('WARNING: Data path is not valid creating random data for test')
-            self.sigMat             = np.random.uniform(low=-1, high=1, size=(2032,512,1))
-            self.acquisitionInfo    = {}
-        else:           
+        print("***** reading data *****")
+        startTime = time.time()
+
+        if self.folderPath == None or scanName == None:
+            print("WARNING: Data path is not valid creating random data for test")
+            self.sigMat = np.random.uniform(low=-1, high=1, size=(2032, 512, 1))
+            self.acquisitionInfo = {}
+        else:
             # read data using h5py
-            signalFile       = h5py.File(os.path.join(self.folderPath, (self.scanName+'.mat')), 'r')
-            
+            signalFile = h5py.File(
+                os.path.join(self.folderPath, (self.scanName + ".mat")), "r"
+            )
+
             # check availability of sigMat
-            if not any(keyCheck== 'sigMat' for keyCheck in signalFile.keys()):
-                raise AssertionError('No sigMat variable key found in data!')
+            if not any(keyCheck == "sigMat" for keyCheck in signalFile.keys()):
+                raise AssertionError("No sigMat variable key found in data!")
 
             # read acquisitionInfo and sigMat
             for keyValue in signalFile.keys():
-                if keyValue == 'sigMat':
-                    self.sigMat             = np.transpose(signalFile['sigMat'])
+                if keyValue == "sigMat":
+                    self.sigMat = np.transpose(signalFile["sigMat"])
 
             # WARNING: If mat file is not saved with -v7.3 use this method
             # signalFile              = sio.loadmat(filePath)
@@ -74,16 +80,16 @@ class oaReader():
                 self.sigMat = self.sigMat
 
         # remove first 2 samples as they do not have signals
-        self.sigMat = self.sigMat[2:,...]
-        
+        # self.sigMat = self.sigMat[2:, ...]
+
         endTime = time.time()
-        print('time elapsed: %.2f' %(endTime-startTime))
+        print("time elapsed: %.2f" % (endTime - startTime))
 
-    #--------------------------------#
-    #---------- properties ----------#
-    #--------------------------------#
+    # --------------------------------#
+    # ---------- properties ----------#
+    # --------------------------------#
 
-    #--------------------------------#
+    # --------------------------------#
     # Path to folder
 
     @property
@@ -97,8 +103,8 @@ class oaReader():
     @folderPath.deleter
     def folderPath(self):
         del self._folderPath
-    
-    #--------------------------------#
+
+    # --------------------------------#
     # Scan name inside the folder
 
     @property
@@ -113,7 +119,7 @@ class oaReader():
     def scanName(self):
         del self._scanName
 
-    #--------------------------------#
+    # --------------------------------#
     # Bool for averaging or not
 
     @property
@@ -128,7 +134,7 @@ class oaReader():
     def averaging(self):
         del self._averaging
 
-    #--------------------------------#
+    # --------------------------------#
     # Axis to average signals
 
     @property
